@@ -187,7 +187,7 @@ module Songkick
 
           if @params[ASSERTION_TYPE]
             uri = URI.parse(@params[ASSERTION_TYPE]) rescue nil
-            unless uri and uri.absolute?
+            unless uri
               @error = INVALID_REQUEST
               @error_description = 'Parameter assertion_type must be an absolute URI'
             end
