@@ -278,15 +278,6 @@ describe Songkick::OAuth2::Provider::Exchange do
       end
     end
 
-    describe "with a non-URI assertion_type" do
-      before { params['assertion_type'] = 'invalid' }
-
-      it "is invalid" do
-        exchange.error.should == 'invalid_request'
-        exchange.error_description.should == 'Parameter assertion_type must be an absolute URI'
-      end
-    end
-
     describe "missing assertion" do
       before { params.delete('assertion') }
 
