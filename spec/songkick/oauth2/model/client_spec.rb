@@ -21,6 +21,11 @@ describe Songkick::OAuth2::Model::Client do
     @client.should_not be_valid
   end
 
+  it "is invalid with a non-URI redirect_uri" do
+    @client.redirect_uri = 'foo'
+    @client.should_not be_valid
+  end
+
   # http://en.wikipedia.org/wiki/HTTP_response_splitting
   it "is invalid if the URI contains HTTP line breaks" do
     @client.redirect_uri = "http://example.com/c\r\nb"
