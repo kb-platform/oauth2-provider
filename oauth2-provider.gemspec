@@ -1,6 +1,7 @@
 spec = Gem::Specification.new do |s|
   s.name              = 'oauth2-provider'
   s.version           = '0.11.2'
+
   s.summary           = 'Simple OAuth 2.0 provider toolkit'
   s.author            = ''
   s.email             = 'wild.fauve@gmail.com'
