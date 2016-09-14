@@ -5,6 +5,8 @@ require 'digest/sha1'
 require 'json'
 require 'logger'
 require 'rack'
+require 'active_support'
+require 'active_support/core_ext/object'
 
 begin
   require 'securerandom'

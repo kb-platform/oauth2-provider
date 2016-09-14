@@ -115,7 +115,6 @@ module OAuth2
         self.code          = nil
         self.id_token      = self.class.create_jwt_access_token(owner)
         self.access_token  = self.class.create_access_token
-        binding.pry
         self.refresh_token = nil
         save!
       end

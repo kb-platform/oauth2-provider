@@ -87,7 +87,6 @@ module OAuth2
       end
 
       def self.generate_id_token(user)
-        binding.pry
         JSON::JWT.new(generate_id_token_hash(user)).sign(rsa_key(ENV[PRIVATE_KEY]), JWT_ALG).to_s
       end
 
