@@ -1,3 +1,5 @@
+require 'jwt'
+
 module OAuth2
   class Router
 
@@ -24,7 +26,6 @@ module OAuth2
         if auth[CLIENT_ID] and auth[CLIENT_ID] != params[CLIENT_ID] and params[GRANT_TYPE] != CLIENT_CREDENTIALS
           error ||= Provider::Error.new("#{CLIENT_ID} from Basic Auth and request body do not match")
         end
-
         params = params.merge(auth)
 
         Provider::AuthHandler.new(build_value(params, resource_owner, error, request))
@@ -44,16 +45,26 @@ module OAuth2
                                   detect_transport_error(env))
       end
 
-      # Given a request that contains an access token (either a tokne provided by this gem or a JWT)
+      # Given a request that contains an access token (either a token provided by this gem or a JWT)
       # return just the token
       def access_token_from_request(env)
         request = request_from(env)
         params  = request.params
         header  = request.env['HTTP_AUTHORIZATION']
-
-        header && header =~ /^(OAuth|Bearer)\s+/ ?
-            header.gsub(/^(OAuth|Bearer)\s+/, '') :
-            params[OAUTH_TOKEN]
+        if header && header =~ /^(OAuth|Bearer)\s+/
+          token = header.gsub(/^(OAuth|Bearer)\s+/, '')
+          begin
+            JWT.decode(token, nil, false)
+            [:jwt, token]
+          rescue JWT::DecodeError
+            # assume that this is an OAUTH_TOKEN
+            [:access_token, token]
+          end
+        elsif params["oauth_token"]
+          [:access_token, params["oauth_token"]]
+        else
+          nil
+        end
       end
 
     private

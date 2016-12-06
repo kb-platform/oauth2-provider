@@ -1,5 +1,7 @@
 require 'sinatra'
 require File.expand_path('../../helper', __FILE__)
+require 'json/jwt'
+require 'jwt'
 
 module TestApp
   class Provider < Sinatra::Base
@@ -8,12 +10,13 @@ module TestApp
 
     OAuth2::Provider.realm = 'Demo App'
 
+    OAuth2::Provider.token_decoder = [JSON::JWT, :decode]
+
     set :views, File.dirname(__FILE__) + '/views'
 
     def handle_authorize
       @oauth2 = OAuth2::Provider.parse(User['Bob'], env).()
       redirect(@oauth2.redirect_uri, @oauth2.response_status) if @oauth2.redirect?
-
       headers @oauth2.response_headers
       status  @oauth2.response_status
 

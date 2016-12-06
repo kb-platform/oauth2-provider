@@ -1,4 +1,5 @@
 module OAuth2
+
   module Model
 
     class Authorization < ActiveRecord::Base
@@ -41,8 +42,8 @@ module OAuth2
       end
 
       def self.create_access_token
-        Lib::SecureCodeScheme.new.generate(predicate: ->(token) {
-          hash = Lib::SecureCodeScheme.new.hashify(token)
+        Lib::SecureCodeScheme.generate(predicate: ->(token) {
+          hash = Lib::SecureCodeScheme.hashify(token)
           Helpers.count(self, :access_token_hash => hash).zero?
         })
       end
@@ -71,6 +72,7 @@ module OAuth2
                      authorization.owner  = owner
                      authorization.client = client
                    end
+
 
         case attributes[RESPONSE_TYPE]
           when CODE
@@ -101,6 +103,15 @@ module OAuth2
           retry
         else
           raise error
+        end
+      end
+
+      def self.find_by_jwt(jwt)
+        # TODO: move check of expiry to a better place
+        begin
+          Time.now.utc.to_i < jwt[:exp] ? User.find(jwt[:sub]) : nil
+        rescue ActiveRecord::ActiveRecordError => e
+          nil
         end
       end
 
@@ -157,7 +168,9 @@ module OAuth2
         scopes = scope ? scope.split(/\s+/) : []
         Set.new(scopes)
       end
+
     end
 
-  end
-end
+  end # module
+
+end # module

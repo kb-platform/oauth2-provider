@@ -8,7 +8,7 @@ module OAuth2
 
       NATIVE_APP_REQUIRED_PARAMS = [GRANT_TYPE, CODE_VERIFIER]
 
-      NATIVE_APP_NOT_ALLOWED = [CLIENT_ID, CLIENT_SECRET]
+      NATIVE_APP_NOT_ALLOWED = [CLIENT_SECRET]
 
       VALID_GRANT_TYPES = [AUTHORIZATION_CODE, PASSWORD, ASSERTION, REFRESH_TOKEN, CLIENT_CREDENTIALS]
 
@@ -41,7 +41,7 @@ module OAuth2
       # It is not integrated into ID as yet
       def generate_id_token
         return if not valid? or @already_updated
-        @authorization.exchange_for_token!(token_type: JWT)
+        @authorization.exchange_for_token!(token_type: :jwt)
         @already_updated = true
       end
 
