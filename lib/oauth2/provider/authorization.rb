@@ -140,7 +140,7 @@ module OAuth2
 
       def code_predicate_function
         if native_app_client?
-          ->(code) {true}
+          ->(code) { !code.nil? }
         else
           ->(code) {Model::Helpers.count(relying_party.authorizations, :code => code).zero?}
         end

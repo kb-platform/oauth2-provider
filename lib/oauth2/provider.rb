@@ -27,6 +27,8 @@ module OAuth2
   ASSERTION              = 'assertion'
   ASSERTION_TYPE         = 'assertion_type'
   AUTHORIZATION_CODE     = 'authorization_code'
+  CIPHER_KEY             = 'IDENTITY_CIPHER_KEY'
+  CIPHER_IV              = 'IDENTITY_CIPHER_IV'
   CLIENT_CREDENTIALS     = 'client_credentials'
   CLIENT_ID              = 'client_id'
   CLIENT_SECRET          = 'client_secret'
@@ -72,7 +74,6 @@ module OAuth2
   EXPIRED_TOKEN          = 'expired_token'
   INSUFFICIENT_SCOPE     = 'insufficient_scope'
   ACCESS_DENIED          = 'access_denied'
-  # SecureCode             = Lib::SecureCodeScheme
 
   class Provider
     EXPIRY_TIME = 3600
@@ -84,7 +85,7 @@ module OAuth2
     autoload :AuthHandler,   ROOT + '/oauth2/provider/auth_handler'
 
     class << self
-      attr_accessor :realm, :enforce_ssl, :default_duration, :token_decoder, :issuer
+      attr_accessor :realm, :enforce_ssl, :default_duration, :token_decoder, :issuer, :aud
     end
 
     def self.clear_assertion_handlers!
@@ -130,14 +131,6 @@ module OAuth2
 
     def self.parse(*args)
       Router.parse(*args)
-    end
-
-    def self.access_token(*args)
-      Router.access_token(*args)
-    end
-
-    def self.access_token_from_request(*args)
-      Router.access_token_from_request(*args)
     end
   end
 

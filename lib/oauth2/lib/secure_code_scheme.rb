@@ -13,16 +13,18 @@ module OAuth2
       # e.g
       # code = generate(attributes: {code_type: 'pkce',code_challenge: "", code_challenge_method: "S256"}, predicate: ->() {true})
       def self.generate(attributes: {code_type: OPAQUE}, predicate: )
-        tuple = case attributes[:code_type]
+        generation_method = case attributes[:code_type]
         when OPAQUE
-          [random_string, :random_string]
+          :random_string
         when PKCE
-          [pkce_string(attributes), :pkce_string]
+          :pkce_string
         else  # Shouldn't get here, but assume opaque
-          [random_string, :random_string]
+          :random_string
         end
-        id = tuple[0]
-        id = send(tuple[1], attributes) until predicate_function(predicate).call(id)
+        id = nil
+        begin
+          id = send(generation_method, attributes)
+        end until predicate_function(predicate).call(id)
         id
       end
 
@@ -48,16 +50,16 @@ module OAuth2
       # Decrypt the auth code originally sent to the relying party
       def self.pkce_decrypt(code)
         cipher = aes_cipher(:decrypt)
-        cipher.update(Base64.urlsafe_decode64(code)) + cipher.final  rescue [nil, nil]
+        begin
+          cipher.update(Base64.urlsafe_decode64(code)) + cipher.final
+        rescue OpenSSL::Cipher::CipherError => e
+          [nil, nil]
+        end
       end
 
 
-      def self.random_string(attributes: {})
-        if defined? SecureRandom
-          SecureRandom.hex(TOKEN_SIZE / 8).to_i(16).to_s(36)
-        else
-          rand(2 ** TOKEN_SIZE).to_s(36)
-        end
+      def self.random_string(attributes = {})
+        SecureRandom.hex(TOKEN_SIZE / 8).to_i(16).to_s(36)
       end
 
       def self.pkce_string(attributes)
@@ -68,8 +70,8 @@ module OAuth2
       def self.aes_cipher(direction)
         cipher = OpenSSL::Cipher::AES.new(256, :CBC)
         cipher.send(direction)
-        cipher.key = "bff19d8c59f31f68d70e34abae5c93420c17f50bc3c278878593ced6b03d916d"
-        cipher.iv = "aa8dbfb30de9bac490cab3aa551376add3462bb9080e0d534f8301cd094f56a7"
+        cipher.key  = ENV[CIPHER_KEY] || cipher.radom_key
+        cipher.iv   = ENV[CIPHER_IV]  || cipher.radom_iv
         cipher
       end
 
@@ -113,7 +115,7 @@ module OAuth2
         # general case, the aud value is an array of case sensitive strings. In
         # the common special case when there is one audience, the aud value MAY be
         # a single case sensitive string.
-        aud: '53be0fe74d61748ee5020000',
+        aud: Provider.aud,
         # REQUIRED. Expiration time on or after which the ID Token MUST NOT be
         # accepted for processing. The processing of this parameter requires that
         # the current date/time MUST be before the expiration date/time listed in

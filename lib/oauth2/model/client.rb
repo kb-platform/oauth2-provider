@@ -52,7 +52,11 @@ module OAuth2
 
       def generate_credentials
         self.client_id = self.class.create_client_id
-        self.client_secret = OAuth2::Lib::SecureCodeScheme.random_string
+        self.client_secret = create_client_secret
+      end
+
+      def create_client_secret
+        Lib::SecureCodeScheme.generate(predicate: ->(client_secret) { true })
       end
     end
 

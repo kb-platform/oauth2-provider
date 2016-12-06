@@ -1,5 +1,7 @@
 = OAuth2::Provider
 
+{<img src="https://travis-ci.org/FlickElectric/oauth2-provider.svg?branch=master" alt="Build Status" />}[https://travis-ci.org/FlickElectric/oauth2-provider]
+
 This gem provides a toolkit for adding OAuth2 provider capabilities to a Ruby
 web app. It handles most of the protocol for you: it is designed to provide
 a sufficient level of abstraction that it can implement updates to the protocol
@@ -398,7 +400,7 @@ permissions.
 
 == License
 
-Copyright (c) 2016 FlickElectric.co.nz
+Copyright (c) 2016 Flick Electric Co.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
