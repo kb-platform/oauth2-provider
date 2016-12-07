@@ -164,6 +164,57 @@ describe OAuth2::Provider::Authorization do
     end
   end
 
+  describe "with a native app" do
+    before do
+      @client.update_attribute(:client_type, OAuth2::NATIVE_APP)
+    end
+
+    describe "with a code challenge and challenge method" do
+      before do
+        params['code_challenge'] = "code_challenge"
+        params['code_challenge_method'] = "S256"
+      end
+
+      it "is valid" do
+        expect(authorization.error).to be_nil
+      end
+    end
+
+    describe "with an invalid code challenge method" do
+      before do
+        params['code_challenge'] = "code_challenge"
+        params['code_challenge_method'] = "AES256"
+      end
+
+      it "is valid" do
+        expect(authorization.error).to eq("invalid_request")
+        expect(authorization.error_description).to eq("Code code_challenge_method MUST be 'S256'")
+      end
+    end
+
+    describe "with a code challenge only" do
+      before do
+        params['code_challenge'] = "code_challenge"
+      end
+
+      it "is invalid" do
+        expect(authorization.error).to eq("invalid_request")
+        expect(authorization.error_description).to eq("Missing required parameter(s) [:code_challenge_method]")
+      end
+    end
+
+    describe "with a challenge method only" do
+      before do
+        params['code_challenge_method'] = "S256"
+      end
+
+      it "is invalid" do
+        expect(authorization.error).to eq("invalid_request")
+        expect(authorization.error_description).to eq("Missing required parameter(s) [:code_challenge]")
+      end
+    end
+  end
+
   describe "#grant_access!" do
     describe "when there is an existing authorization with no code" do
       before do

@@ -168,6 +168,30 @@ describe OAuth2::Model::Authorization do
     end
   end
 
+
+  describe ".generate_code" do
+    before {
+      allow(OAuth2::Lib::SecureCodeScheme).to receive(:random_string).and_return('new_code')
+    }
+
+    it "returns the first code the client has not used" do
+      predicate_function = ->(code) {OAuth2::Model::Helpers.count(client.authorizations, :code => code).zero?}
+      expect(authorization.generate_code(predicate: predicate_function)).to eq('new_code')
+    end
+
+    context "native client" do
+      before do
+        client.client_type = OAuth2::NATIVE_APP
+      end
+
+      it "returns the first code the client has not used" do
+        predicate_function = ->(code) {OAuth2::Model::Helpers.count(client.authorizations, :code => code).zero?}
+        expect(authorization.generate_code(predicate: predicate_function)).to eq('new_code')
+      end
+    end
+  end
+
+
   describe "#grants_access?" do
     it "returns true given the right user" do
       expect(authorization.grants_access?(tester)).to be true

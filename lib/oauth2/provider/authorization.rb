@@ -60,10 +60,6 @@ module OAuth2
 
       def grant_access!(options = {})
         auth = Model::Authorization.for(@owner, relying_party, params.merge('duration' => options[:duration]))
-          # :response_type => @params[RESPONSE_TYPE],
-          # :scope         => @scope,
-          # :duration      => options[:duration],
-          # )
 
         @code          = auth.code
         @access_token  = auth.access_token
@@ -209,7 +205,7 @@ module OAuth2
 
       def check_native_code_challenge
         # Check that where is a code challege
-        if relying_party.native_app?
+        if native_app_client?
           if @params[CODE_CHALLENGE].nil?
             @error = INVALID_REQUEST
             @error_description = "Code code_challenge must be provided"
@@ -220,10 +216,10 @@ module OAuth2
 
       def check_native_code_challenge_method
         # Check that where is a code_challenge_method is "S256" when PKCE is enabled (for native_apps)
-        if relying_party.native_app?
+        if native_app_client?
           if @params[CODE_CHALLENGE_METHOD] != CODE_CHALLENGE_HASH_METHOD
             @error = INVALID_REQUEST
-            @error_description = "Code code_challenge_method MUST be 'SHA256'"
+            @error_description = "Code code_challenge_method MUST be 'S256'"
           end
         end
       end

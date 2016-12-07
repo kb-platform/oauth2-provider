@@ -375,4 +375,104 @@ end # describe user password grant
     it_should_behave_like "validates required parameters"
     it_should_behave_like "valid token request"
   end
+
+  describe "using authorization_code grant type for Native App" do
+    let(:params) { { 'grant_type'    => 'authorization_code',
+                     'code'          => @authorization.code,
+                     'code_verifier' => 'a_fake_code_verifier',
+                     'redirect_uri'  => @client.redirect_uri, }
+                 }
+
+    before do
+      @client.update_attribute(:client_type, OAuth2::NATIVE_APP)
+      allow(OAuth2::Lib::SecureCodeScheme).to receive(:pkce_run_hash_on_verifier).and_return(@authorization.code)
+      allow(OAuth2::Lib::SecureCodeScheme).to receive(:pkce_decrypt).and_return(@authorization.code)
+    end
+
+    describe "missing grant_type" do
+      before { params.delete('grant_type') }
+
+      it "is invalid" do
+        expect(exchange.error).to eq("invalid_request")
+        expect(exchange.error_description).to eq("Missing required parameter grant_type")
+      end
+    end
+
+    describe "missing code" do
+      before { params.delete('code') }
+
+      it "is invalid" do
+        expect(exchange.error).to eq("invalid_request")
+        expect(exchange.error_description).to eq("Missing required parameter client_secret")
+      end
+    end
+
+    describe "with an unknown grant type" do
+      before { params['grant_type'] = 'unknown' }
+
+      it "is invalid" do
+        expect(exchange.error).to eq("unsupported_grant_type")
+        expect(exchange.error_description).to eq("The grant type unknown is not recognized")
+      end
+    end
+
+    describe "with client_id" do
+      before { params['client_id'] =  @client.client_id }
+
+      it "is valid" do
+        expect(exchange.error).to be_nil
+      end
+    end
+
+    describe "with client_id and no code" do
+      before {
+        params['client_id'] =  @client.client_id
+        params.delete('code')
+      }
+
+      it "is invalid" do
+        expect(exchange.error).to eq("invalid_request")
+        expect(exchange.error_description).to eq("Missing required parameter code")
+      end
+    end
+
+    describe "with an unknown client_id" do
+      before {
+        params['client_id'] = "unknown"
+        params.delete('code')
+      }
+
+      it "is invalid" do
+        expect(exchange.error).to eq("invalid_request")
+        expect(exchange.error_description).to eq("Missing required parameter client_secret")
+      end
+    end
+
+    describe "with client_secret" do
+      before { params['client_secret'] = @client.client_secret }
+
+      it "is invalid" do
+        expect(exchange.error).to eq("invalid_request")
+        expect(exchange.error_description).to eq("[:client_secret] must not be provided for native app")
+      end
+    end
+
+    describe "with lesser scope than the authorization code represents" do
+      before { params['scope'] = nil }
+
+      it "is valid" do
+        expect(exchange.error).to be_nil
+      end
+    end
+
+    describe "with scopes not covered by the authorization code" do
+      before { params['scope'] = 'qux' }
+
+      it "is invalid" do
+        expect(exchange.error).to eq('invalid_scope')
+        expect(exchange.error_description).to eq('The request scope was never granted by the user')
+      end
+    end
+
+  end
 end

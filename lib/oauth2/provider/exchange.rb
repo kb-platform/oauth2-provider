@@ -163,7 +163,7 @@ module OAuth2
 
       def validate_required_params
         # Native apps may not provide client_id/secret, so, dont check for them
-        checked_params = relying_party.try(:native_app?) ? NATIVE_APP_REQUIRED_PARAMS : REQUIRED_PARAMS
+        checked_params = native_app_client? ? NATIVE_APP_REQUIRED_PARAMS : REQUIRED_PARAMS
         checked_params.each do |param|
           next if @params.has_key?(param)
           @error = INVALID_REQUEST
@@ -171,8 +171,12 @@ module OAuth2
         end
       end
 
+      def native_app_client?
+        relying_party.try(:native_app?)
+      end
+
       def validate_native_app_security_leak
-        if relying_party.try(:native_app?)
+        if native_app_client?
           not_allowed = NATIVE_APP_NOT_ALLOWED & @params.keys
           unless not_allowed.empty?
             @error = INVALID_REQUEST
@@ -289,7 +293,7 @@ module OAuth2
           @error_description = 'The access grant you supplied is invalid'
         end
 
-        # The code is actually a PKCE code when from a native apps
+        # The code is actually a PKCE code when from a native app
         # we need to validate using the code_verifier
         if relying_party.native_app?
 
