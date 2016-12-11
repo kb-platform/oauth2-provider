@@ -1,8 +1,8 @@
 # OAuth2::Provider
 
-{<img src="https://travis-ci.org/FlickElectric/oauth2-provider.svg?branch=master" alt="Build Status" />}[https://travis-ci.org/FlickElectric/oauth2-provider]
+![Build Status](https://travis-ci.org/FlickElectric/oauth2-provider.svg?branch=master)
 
-In the good old OAuth2 days; before wrote his (caustic rant)[https://hueniverse.com/2012/07/26/oauth-2-0-and-the-road-to-hell/] highlighting its problems, before OpenIdConnect was even invented, this Gem appeared from SongKick (no longer with us) to handle the new protocol.  This gem attempts to handle the OAuth2 world.  But where we are using OpenIdConnect, and managing authentication through Devise (itself a massive framework), and are starting to add protocols for mobile Oauth2 behaviour, we are not reliant on all the gem offers.  
+In the good old OAuth2 days; before wrote his [caustic rant](https://hueniverse.com/2012/07/26/oauth-2-0-and-the-road-to-hell/) highlighting its problems, before OpenIdConnect was even invented, this Gem appeared from SongKick (no longer with us) to handle the new protocol.  This gem attempts to handle the OAuth2 world.  But where we are using OpenIdConnect, and managing authentication through Devise (itself a massive framework), and are starting to add protocols for mobile Oauth2 behaviour, we are not reliant on all the gem offers.  
 
 So, if you want to read about its Universe, track down the original Gem, otherwise, here you'll find more about the Flick use of the provider gem.
 
@@ -23,7 +23,7 @@ gem install oauth2-provider
 
 ## A note on versioning
 
-This library was based on (draft-10)[http://tools.ietf.org/html/draft-ietf-oauth-v2-10],
+This library was based on [draft-10](http://tools.ietf.org/html/draft-ietf-oauth-v2-10).
 of the spec.  This still remains, sort of, true, but we have added to this baseline:
 
 * OpenId Connect tokens
@@ -46,7 +46,7 @@ release for draft 10.
   **client** (i.e., a user grants access to a company's app), an
   authorization is created. This can be revoked by the user. Revocation is not provided in the gem, but rather is the responsibility of the service.
 * **Access Token**: An opaque string representing an **authorization**.  We **DONT USE** access_tokens anymore.  Call it an amicable breakup!  Our tokens are....
-* **Identity Tokens**.  Id tokens are defined in (OpenIdConnect)[http://openid.net/specs/openid-connect-core-1_0.html] and serialised as JSON Web Tokens (JWT).  They are signed using RSA public-key mechanisms.
+* **Identity Tokens**.  Id tokens are defined in [OpenIdConnect](http://openid.net/specs/openid-connect-core-1_0.html) and serialised as JSON Web Tokens (JWT).  They are signed using RSA public-key mechanisms.
 
 
 
