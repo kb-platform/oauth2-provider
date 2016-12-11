@@ -1,19 +1,22 @@
 require 'sinatra'
 require File.expand_path('../../helper', __FILE__)
+require 'json/jwt'
+require 'jwt'
 
 module TestApp
   class Provider < Sinatra::Base
 
     extend Helper::RackRunner
 
-    Songkick::OAuth2::Provider.realm = 'Demo App'
+    OAuth2::Provider.realm = 'Demo App'
+
+    OAuth2::Provider.token_decoder = [JSON::JWT, :decode]
 
     set :views, File.dirname(__FILE__) + '/views'
 
     def handle_authorize
-      @oauth2 = Songkick::OAuth2::Provider.parse(User['Bob'], env)
+      @oauth2 = OAuth2::Provider.parse(User['Bob'], env).()
       redirect(@oauth2.redirect_uri, @oauth2.response_status) if @oauth2.redirect?
-
       headers @oauth2.response_headers
       status  @oauth2.response_status
 
@@ -27,7 +30,7 @@ module TestApp
     end
 
     def protect_resource_for(user = nil, scopes = [])
-      access_token = Songkick::OAuth2::Provider.access_token(user, scopes, env)
+      access_token = OAuth2::Provider.access_token(user, scopes, env)
       headers access_token.response_headers
       status  access_token.response_status
       yield access_token
@@ -50,7 +53,7 @@ module TestApp
 
     post '/allow' do
       @user = User['bob']
-      @oauth2 = Songkick::OAuth2::Provider::Authorization.new(@user, params)
+      @oauth2 = OAuth2::Provider::Authorization.new(@user, params)
       if params['allow'] == '1'
         @oauth2.grant_access! :duration => 3.hours
       else
@@ -65,4 +68,3 @@ module TestApp
 
   end
 end
-
