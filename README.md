@@ -2,7 +2,7 @@
 
 ![Build Status](https://travis-ci.org/FlickElectric/oauth2-provider.svg?branch=master)
 
-In the good old OAuth2 days; before wrote his [caustic rant](https://hueniverse.com/2012/07/26/oauth-2-0-and-the-road-to-hell/) highlighting its problems, before OpenIdConnect was even invented, this Gem appeared from SongKick (no longer with us) to handle the new protocol.  This gem attempts to handle the OAuth2 world.  But where we are using OpenIdConnect, and managing authentication through Devise (itself a massive framework), and are starting to add protocols for mobile Oauth2 behaviour, we are not reliant on all the gem offers.  
+In the good old OAuth2 days; before [this caustic rant](https://hueniverse.com/2012/07/26/oauth-2-0-and-the-road-to-hell/) made us question dancing in dark alleys with access_tokens, before OpenIdConnect was even invented, this Gem appeared from SongKick (no longer with us) to handle the new protocol.  This gem attempts to handle the OAuth2 world.  But where we are using OpenIdConnect, and managing authentication through Devise (itself a massive framework), and are starting to add protocols for mobile Oauth2 behaviour, we are not reliant on all the gem offers.  
 
 So, if you want to read about its Universe, track down the original Gem, otherwise, here you'll find more about the Flick use of the provider gem.
 
